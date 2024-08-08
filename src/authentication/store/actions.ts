@@ -8,6 +8,8 @@ export type AuthenticationActions = {
     requestAccessTokenToDjangoRedirection(
         context: ActionContext<AuthenticationState, any>, 
         payload: { code: string }): Promise<void>
+    requestUserInfoToDjango(
+        context: ActionContext<AuthenticationState, any>): Promise<any>
 }
 const actions: AuthenticationActions = {
     async requestKakaoOauthRedirectionToDjango(): Promise<void> {
@@ -29,6 +31,24 @@ const actions: AuthenticationActions = {
         } catch (error) {
             console.log('Access Token 요청 중 문제 발생:', error)
             throw error
+        }
+    },
+    async requestUserInfoToDjango(
+            context: ActionContext<AuthenticationState, any>): Promise<any> {
+
+        try {
+            const accessToken = localStorage.getItem("accessToken");
+            const userInfoResponse: AxiosResponse<any> = 
+                await axiosInst.djangoAxiosInst.post(
+                    '/oauth/kakao/user-info', 
+                    { access_token: accessToken });
+
+            const userInfo = userInfoResponse.data.user_info
+            return userInfo
+
+        } catch (error) {
+            alert('사용자 정보 가져오기 실패!')
+            throw error;
         }
     },
 };
