@@ -7,6 +7,7 @@ const routes: Array<RouteRecordRaw> = [
   ...BoardRoutes,
   ...HomeRoutes,
   ...AccountRoutes
+  ...AccountRoutes,
 ]  
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
