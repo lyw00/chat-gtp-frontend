@@ -21,6 +21,7 @@ export default {
     methods: {
         ...mapActions(authenticationModule, [
             'requestAccessTokenToDjangoRedirection',
+            'requestUserInfoToDjango',
         ]),
         ...mapActions(accountModule, [
             'requestEmailDuplicationCheckToDjango',
@@ -30,6 +31,12 @@ export default {
             const code = this.$route.query.code
 
             await this.requestAccessTokenToDjangoRedirection({ code })
+            const userInfo = await this.requestUserInfoToDjango()
+            this.email = userInfo.kakao_account.email
+            this.nickname = userInfo.properties.nickname
+            this.password = Math.random().toString(36).slice(-8)
+            this.logintype = "KAKAO"
+            
             const isEmailDuplication = 
                 await this.requestEmailDuplicationCheckToDjango({ "email": this.email })
             if (isEmailDuplication === true) {
