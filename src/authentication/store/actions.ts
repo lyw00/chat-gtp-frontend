@@ -10,7 +10,15 @@ export type AuthenticationActions = {
         payload: { code: string }): Promise<void>
     requestUserInfoToDjango(
         context: ActionContext<AuthenticationState, any>): Promise<any>
+    requestAddRedisAccessTokenToDjango(
+        context: ActionContext<AuthenticationState, any>,
+        { email, accessToken }: { email: string, accessToken: string }): Promise<any>
+    requestLogoutToDjango(
+        context: ActionContext<AuthenticationState, any>,
+        userToken: string
+    ): Promise<void>
 }
+
 const actions: AuthenticationActions = {
     async requestKakaoOauthRedirectionToDjango(): Promise<void> {
         return axiosInst.djangoAxiosInst.get('/oauth/kakao').then((res) => {
@@ -51,5 +59,51 @@ const actions: AuthenticationActions = {
             throw error;
         }
     },
+    async requestAddRedisAccessTokenToDjango(
+        { commit, state }: ActionContext<AuthenticationState, any>,
+        { email, accessToken }: { email: string, accessToken: string }
+    ): Promise<any> {
+        try {
+            const response: AxiosResponse<any> = await axiosInst.djangoAxiosInst.post(
+                '/oauth/redis-access-token/', {
+                    email: email,
+                    accessToken: accessToken
+                });
+
+            console.log('userToken:', response.data.userToken)
+
+            localStorage.removeItem("accessToken")
+            localStorage.setItem("userToken", response.data.userToken)
+            commit(REQUEST_IS_AUTHENTICATED_TO_DJANGO, true);
+            return response.data;
+        } catch (error) {
+            console.error('Error adding redis access token:', error);
+            throw error;
+        }
+    },
+    async requestLogoutToDjango(
+        context: ActionContext<AuthenticationState, any>,
+        userToken: string
+    ): Promise<void> {
+        try {
+            const userToken = localStorage.getItem("userToken")
+
+            const res = 
+                await axiosInst.djangoAxiosInst.post('/oauth/logout', {
+                    userToken: userToken
+                })
+
+            console.log('res:', res.data.isSuccess)
+            if (res.data.isSuccess === true) {
+                context.commit('REQUEST_IS_AUTHENTICATED_TO_DJANGO', false)
+            }
+        } catch (error) {
+            console.error('requestPostToFastapi() 중 에러 발생:', error)
+            throw error
+        }
+        localStorage.removeItem("userToken")
+        localStorage.removeItem("isAdmin")
+    }
 };
+
 export default actions;

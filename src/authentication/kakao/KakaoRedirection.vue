@@ -22,6 +22,7 @@ export default {
         ...mapActions(authenticationModule, [
             'requestAccessTokenToDjangoRedirection',
             'requestUserInfoToDjango',
+            'requestAddRedisAccessTokenToDjango',
         ]),
         ...mapActions(accountModule, [
             'requestEmailDuplicationCheckToDjango',
