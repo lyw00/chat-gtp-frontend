@@ -6,7 +6,7 @@
           <v-list-item @click="toggleBookmarks" class="clickable-item">
             <v-list-item-icon>
               <v-icon>mdi-bookmark</v-icon>
-              <span> 즐겨찾기</span>
+              <span>즐겨찾기</span>
             </v-list-item-icon>
             <v-list-item-action>
               <v-icon>{{ isBookmarksOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
@@ -21,12 +21,13 @@
       </v-container>
 
       <v-spacer></v-spacer>
+
       <v-container fluid class="pa-0" style="overflow: auto;">
         <v-list>
           <v-list-item @click="toggleHistory" class="clickable-item">
             <v-list-item-icon>
               <v-icon>mdi-history</v-icon>
-              <span> 채팅기록</span>
+              <span>채팅기록</span>
             </v-list-item-icon>
             <v-list-item-action>
               <v-icon>{{ isHistoryOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
@@ -44,9 +45,13 @@
     <v-app-bar app flat color="white">
       <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
       <v-toolbar-title>ChatGPT Style</v-toolbar-title>
-      <v-btn text @click="signIn" class="btn-text">
+      <v-btn v-if="!isAuthenticated && !isLoggedIn" text @click="signIn" class="btn-text">
         <v-icon right>mdi-login</v-icon>
         <span>LogIn</span>
+      </v-btn>
+      <v-btn v-if="isAuthenticated || isLoggedIn" text @click="signOut" class="btn-text">
+        <v-icon right>mdi-logout</v-icon>
+        <span>LogOut</span>
       </v-btn>
     </v-app-bar>
 
@@ -59,13 +64,6 @@
             </div>
           </div>
 
-          <!-- 네이버 로그인 버튼 노출 영역 -->
-          <!-- <div id="naver_id_login"></div> -->
-
-          <!-- 구글 로그인 버튼 노출 영역 -->
-          <!-- <div id="google-signin-button"></div> -->
-
-          <!-- Input Box, Send Button, and Clear Chat Button -->
           <v-card class="chat-input-card">
             <v-card-text>
               <div class="input-container">
@@ -81,13 +79,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import router from '@/router';
-// import VueJwtDecode from "vue-jwt-decode";
+import { useStore } from 'vuex';
 
 export default defineComponent({
   name: 'HomeView',
   setup() {
+    const store = useStore();
     const messageInput = ref('');
     const messages = ref<string[]>([]);
     const drawer = ref(true);
@@ -99,10 +98,6 @@ export default defineComponent({
         messages.value.push(messageInput.value);
         messageInput.value = '';
       }
-    };
-
-    const signIn = () => {
-      router.push('/account/login');
     };
 
     const toggleDrawer = () => {
@@ -117,20 +112,39 @@ export default defineComponent({
       isHistoryOpen.value = !isHistoryOpen.value;
     };
 
+    const isAuthenticated = computed(() => store.state.authenticationModule.isAuthenticated);
+    const isLoggedIn = computed(() => store.state.accountModule.isLoggedIn);
+
+    const signIn = () => {
+      router.push('/account/login');
+    };
+
+    const signOut = async () => {
+      if (isLoggedIn.value) {
+        await store.commit('accountModule/REQUEST_IS_ACCOUNT_TO_DJANGO', false);
+      }
+      if (isAuthenticated.value) {
+        await store.dispatch('authenticationModule/requestLogoutToDjango');
+      }
+      router.push('/');
+    };
 
     return {
       messageInput,
       messages,
       sendMessage,
-      signIn,
       drawer,
       toggleDrawer,
       isBookmarksOpen,
       isHistoryOpen,
       toggleBookmarks,
       toggleHistory,
+      isAuthenticated,
+      isLoggedIn,
+      signIn,
+      signOut
     };
-  },
+  }
 });
 </script>
 
