@@ -1,0 +1,63 @@
+<template>
+    <div></div>
+</template>
+
+<script>
+import router from '@/router';
+import { mapActions, mapState } from 'vuex'
+
+const authenticationModule = 'authenticationModule'
+const accountModule = 'accountModule'
+
+export default {
+    data () {
+        return{
+            email:'',
+            nickname: '',
+            password: '',
+            logintype:'',
+        }
+    },
+    methods: {
+        ...mapActions(authenticationModule, [
+            'requestAccessTokenToDjangoRedirection',
+        ]),
+        ...mapActions(accountModule, [
+            'requestEmailDuplicationCheckToDjango',
+            'requestCreateNewAccountToDjango'
+        ]),
+        async setRedirectData () {
+            const code = this.$route.query.code
+
+            await this.requestAccessTokenToDjangoRedirection({ code })
+            const isEmailDuplication = 
+                await this.requestEmailDuplicationCheckToDjango({ "email": this.email })
+            if (isEmailDuplication === true) {
+
+                const accessToken = localStorage.getItem("accessToken");
+                if (accessToken) {
+                    await this.requestAddRedisAccessTokenToDjango({ email:this.email, accessToken });
+                    
+                } else {
+                    console.error('AccessToken is missing');
+                }
+                this.$router.push('/')
+            }else {
+                const accountInfo = {
+                    email: this.email,
+                    nickname: this.nickname,
+                    password: this.password,
+                    logintype: this.logintype
+                }
+                console.log('전송한 데이터:', accountInfo)
+                await this.requestCreateNewAccountToDjango(accountInfo)
+
+                router.push('/')
+            } 
+        }
+    },
+    async created () {
+        await this.setRedirectData()
+    }
+}
+</script>
