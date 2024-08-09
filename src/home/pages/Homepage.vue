@@ -45,11 +45,11 @@
     <v-app-bar app flat color="white">
       <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
       <v-toolbar-title>ChatGPT Style</v-toolbar-title>
-      <v-btn v-if="!isAuthenticated && !isLoggedIn" text @click="signIn" class="btn-text">
+      <v-btn v-if="!isKakaoAuthenticated && !isLoggedIn" text @click="signIn" class="btn-text">
         <v-icon right>mdi-login</v-icon>
         <span>LogIn</span>
       </v-btn>
-      <v-btn v-if="isAuthenticated || isLoggedIn" text @click="signOut" class="btn-text">
+      <v-btn v-if="isKakaoAuthenticated || isLoggedIn" text @click="signOut" class="btn-text">
         <v-icon right>mdi-logout</v-icon>
         <span>LogOut</span>
       </v-btn>
@@ -112,7 +112,7 @@ export default defineComponent({
       isHistoryOpen.value = !isHistoryOpen.value;
     };
 
-    const isAuthenticated = computed(() => store.state.authenticationModule.isAuthenticated);
+    const isKakaoAuthenticated = computed(() => store.state.authenticationModule.isKakaoAuthenticated);
     const isLoggedIn = computed(() => store.state.accountModule.isLoggedIn);
 
     const signIn = () => {
@@ -123,7 +123,7 @@ export default defineComponent({
       if (isLoggedIn.value) {
         await store.commit('accountModule/REQUEST_IS_ACCOUNT_TO_DJANGO', false);
       }
-      if (isAuthenticated.value) {
+      if (isKakaoAuthenticated.value) {
         await store.dispatch('authenticationModule/requestLogoutToDjango');
       }
       router.push('/');
@@ -139,7 +139,7 @@ export default defineComponent({
       isHistoryOpen,
       toggleBookmarks,
       toggleHistory,
-      isAuthenticated,
+      isKakaoAuthenticated,
       isLoggedIn,
       signIn,
       signOut

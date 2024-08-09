@@ -55,6 +55,14 @@
                     aspect-ratio="1"
                     @click="goToKakaoLogin"
                   />
+                  <v-img
+                    class="mx-auto icons"
+                    height="40"
+                    style="margin-top: 30px;"
+                    :src="require('@/assets/images/fixed/google_login.png')"
+                    aspect-ratio="1"
+                    @click="goToGoogleLogin"
+                  />
                 </div>
               </v-col>
             </v-row>
@@ -89,9 +97,13 @@
       const goToKakaoLogin = async () => {
         await store.dispatch('authenticationModule/requestKakaoOauthRedirectionToDjango')
       }
+      const goToGoogleLogin = async () => {
+        await store.dispatch('GoogleAuthenticationModule/requestGoogleOauthRedirectionToDjango')
+      }
   
       return {
-        goToKakaoLogin
+        goToKakaoLogin,
+        goToGoogleLogin
       }
     },computed: {
       ...mapState(accountModule, ['isLoggedIn'])
