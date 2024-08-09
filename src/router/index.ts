@@ -3,12 +3,14 @@ import BoardRoutes from '@/board/router/BoardRoutes'
 import HomeRoutes from '@/home/router/HomeRoutes'
 import AccountRoutes from '@/account/router/AccountRoutes'
 import AuthenticationRoutes from '@/authentication/router/AuthenticationRoutes'
+import GoogleAuthenticationRoutes from '@/googleAuthetication/router/GoogleAuthenticationRoutes'
 
 const routes: Array<RouteRecordRaw> = [
   ...BoardRoutes,
   ...HomeRoutes,
   ...AccountRoutes,
-  ...AuthenticationRoutes
+  ...AuthenticationRoutes,
+  ...GoogleAuthenticationRoutes,
 ]  
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),

@@ -1,9 +1,9 @@
 export interface AuthenticationState {
-    isKakaoAuthenticated: boolean
+    isGoogleAuthenticated: boolean
 }
 
 const state: AuthenticationState = {
-    isKakaoAuthenticated: false
+    isGoogleAuthenticated: false
 }
 
 export default state

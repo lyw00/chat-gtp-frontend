@@ -1,6 +1,7 @@
 import accountModule from '@/account/store/accountModule'
 import authenticationModule from '@/authentication/store/authenticationModule'
 import boardModule from '@/board/store/boardModule'
+import GoogleAuthenticationModule from "@/googleAuthetication/store/GoogleAuthenticationModule"
 import { createStore } from 'vuex'
 
 export default createStore({
@@ -15,6 +16,7 @@ export default createStore({
   modules: {
     boardModule,
     accountModule,
-    authenticationModule
+    authenticationModule,
+    GoogleAuthenticationModule,
   }
 })
